@@ -2,7 +2,7 @@
 
 KERAG is a powerful system designed to transform Markdown files with custom syntax into a hierarchical, cross-referenced knowledge-tree structure for knowledge retrieval and AI-driven exploration.
 
-## 🚀 Installation
+## Installation
 
 You can install the core library directly from GitHub:
 
@@ -10,7 +10,7 @@ You can install the core library directly from GitHub:
 pip install git+https://github.com/TongWang-AI4S/KERAG.git
 ```
 
-## ✨ Key Features
+## Key Features
 
 - **Hierarchical Node Structure**: Transforms linear Markdown into a navigable tree.
 - **Custom Syntax**:
@@ -18,7 +18,7 @@ pip install git+https://github.com/TongWang-AI4S/KERAG.git
     - `(@node_id)`: Create cross-references.
     - `## (@referred_node_id)`: Embed subtrees.
 
-## 🌳 Quick Knowledge Tree Building
+## Quick Knowledge Tree Building
 
 Use the `kerag tool split` command to quickly build a preliminary knowledge tree from a large Markdown document:
 
@@ -38,7 +38,7 @@ This command will:
 - Generate separate files for each section at the specified heading level
 - Automatically adjust heading levels in sub-files
 
-## 📂 Knowledge Base Directories & Scopes
+## Knowledge Base Directories & Scopes
 
 KERAG supports two scopes for knowledge base management, allowing you to flexibly organize general and project-specific knowledge:
 
@@ -55,7 +55,7 @@ When executing module management commands (e.g., `install`, `list`, `scan`, `rem
 - `-g` or `--global`: Target the global scope.
 - `-l` or `--local`: Target the local scope.
 
-## 📝 Minimal Example
+## Minimal Example
 
 Create a file named `index.md`:
 
@@ -71,7 +71,7 @@ Vectors are quantities with both magnitude and direction.
 (@vector): Introduction to vectors
 ```
 
-## 📦 Module Management
+## Module Management
 
 ### Packing a Module
 To distribute your knowledge base, pack it into a `.tar` archive:
@@ -94,7 +94,7 @@ kerag install https://example.com/module.tar
 kerag install git+https://github.com/username/kerag-module.git
 ```
 
-## 🖥️ Knowledge Base Viewing & AI Search
+## Knowledge Base Viewing & AI Search
 
 KERAG provides companion projects for knowledge base exploration and AI-driven search.
 
@@ -148,6 +148,6 @@ kerag install https://github.com/TongWang-AI4S/KERAG-Modules/releases/heads/main
 
 Browse the [KERAG-Modules repository](https://github.com/TongWang-AI4S/KERAG-Modules) to find available knowledge bases.
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License.

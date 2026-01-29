@@ -1,8 +1,8 @@
 # KERAG (知识探索检索增强生成) - 核心库
 
-KERAG 是一个强大的系统，旨在将带有自定义语法的 Markdown 文件转换为分层的知识库结构，方便知识检索和 AI 驱动的探索。
+KERAG 旨在将带有自定义语法的 Markdown 文件转换为分层的知识库结构，方便知识检索和 AI 驱动的探索。
 
-## 🚀 安装
+## 安装
 
 你可以直接从 GitHub 安装核心库：
 
@@ -10,7 +10,7 @@ KERAG 是一个强大的系统，旨在将带有自定义语法的 Markdown 文�
 pip install git+https://github.com/TongWang-AI4S/KERAG.git
 ```
 
-## ✨ 核心特性
+## 核心特性
 
 - **分层节点结构**: 将线性 Markdown 转换为可导航的节点图。
 - **自定义语法**:
@@ -19,7 +19,7 @@ pip install git+https://github.com/TongWang-AI4S/KERAG.git
     - `## (@referred_node_id)`: 嵌入整个子树。
 - **快速知识树构建器**: 使用 `kerag tool split` 命令自动将大型文档分割为分层知识模块。
 
-## 🌳 快速构建知识树
+## 快速构建知识树
 
 使用 `kerag tool split` 命令可以快速从大型 Markdown 文档构建初步知识树：
 
@@ -39,7 +39,7 @@ kerag tool split my-document.md --all-labeled
 - 为指定标题级别的每个章节生成独立文件
 - 自动调整子文件中的标题层级
 
-## 📂 知识库目录与作用域
+## 知识库目录与作用域
 
 KERAG 支持两种作用域的知识库管理，允许您灵活组织通用知识和项目特定知识：
 
@@ -56,7 +56,7 @@ KERAG 支持两种作用域的知识库管理，允许您灵活组织通用知�
 - `-g` 或 `--global`: 操作全局作用域。
 - `-l` 或 `--local`: 操作局部作用域。
 
-## 📝 最简案例
+## 最简案例
 
 创建一个名为 `index.md` 的文件：
 
@@ -72,7 +72,7 @@ KERAG 支持两种作用域的知识库管理，允许您灵活组织通用知�
 (@vector): 向量简介
 ```
 
-## 📦 模块管理
+## 模块管理
 
 ### 打包模块
 要分发您的知识库，请将其打包为 `.tar` 归档文件：
@@ -95,7 +95,7 @@ kerag install https://example.com/module.tar
 kerag install git+https://github.com/username/kerag-module.git
 ```
 
-## 🖥️ 知识库检视与 AI 搜索
+## 知识库检视与 AI 搜索
 
 KERAG 提供配套项目，用于知识库的可视化检视和 AI 驱动搜索。
 
@@ -148,6 +148,6 @@ kerag install https://github.com/TongWang-AI4S/KERAG-Modules/releases/heads/main
 
 浏览 [KERAG-Modules 仓库](https://github.com/TongWang-AI4S/KERAG-Modules) 查找更多可用知识库。
 
-## 📄 开源协议
+## 开源协议
 
 本项目采用 MIT 开源协议。
