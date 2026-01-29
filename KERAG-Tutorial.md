@@ -2,7 +2,7 @@
 <!-- Version: 0.1.0 -->
 <!-- Description: KERAG Tutorial - Building Structured Knowledge Base from Scratch -->
 
-# KERAG Tutorial [@kerag-tutorial]
+# KERAG Tutorial
 
 This tutorial will guide you through the core concepts and workflows of KERAG (Knowledge Explorer Retrieval Augmented Generation) using a consistent case study—**building a Linear Algebra knowledge base**.
 
@@ -10,9 +10,9 @@ We will start from a simple single file, gradually add advanced syntax, split it
 
 ---
 
-# Core Concepts and Single File Structure [@core-concepts]
+# Core Concepts and Single File Structure
 
-## Case Stage 1: Creating a Simple Single-File Knowledge Base [@case-stage-1]
+## Case Stage 1: Creating a Simple Single-File Knowledge Base
 
 In KERAG, we parse Markdown text into nodes and knowledge trees for review.
 
@@ -37,7 +37,7 @@ A matrix is a rectangular array of complex or real numbers.
 <!-- Comments are directly ignored by the node tree building logic, currently only single-line comments are supported -->
 ```
 
-## Node Types [@node-types]
+## Node Types
 
 This simple example already contains the two core node types of KERAG:
 
@@ -52,7 +52,7 @@ This simple example already contains the two core node types of KERAG:
 - **Belonging**: Each content block belongs to the most recent section node above it.
 - **Example**: "A vector is a quantity that has both magnitude and direction." is content belonging to the `## Vectors` node.
 
-## Tree Structure Visualization [@tree-visualization]
+## Tree Structure Visualization
 
 KERAG will parse the above file into the following logical tree structure:
 
@@ -70,9 +70,9 @@ This structure allows both AI and humans to precisely locate and reference speci
 
 ---
 
-# Basic Syntax [@basic-syntax]
+# Basic Syntax
 
-## Case Stage 2: Adding Labels and Links to the Knowledge Base [@case-stage-2]
+## Case Stage 2: Adding Labels and Links to the Knowledge Base
 
 To establish connections between knowledge points, we need to use KERAG's extended syntax. Let's upgrade the `linear-algebra/index.md` now.
 
@@ -97,7 +97,7 @@ Vectors are the basic units of linear algebra. Usually represented by (@matrix) 
 (@/calculus/multivariate::gradient)
 ```
 
-## Labels [@labels]
+## Labels
 
 Sometimes we need to reference certain sections or content elsewhere. **Labels** provide a way to reference sections.
 
@@ -105,14 +105,14 @@ Sometimes we need to reference certain sections or content elsewhere. **Labels**
 - **Purpose**: Specifies the unique identifier suffix for the node.
 - **Example**: `## Matrices [@matrix]` has the node label `matrix`.
 
-## Inline Links [@inline-links]
+## Inline Links
 
 Reference other nodes in the body text to build a knowledge network.
 
 - **Syntax**: `(@node_id)` or `(@label)` (can be abbreviated within the same file).
 - **Example**: `See (@vector)` creates a hyperlink pointing to the vector node.
 
-## See Also Blocks [@see-also]
+## See Also Blocks
 
 Explicitly listing related knowledge points at the end of a section is not only reader-friendly but also enhances RAG retrieval relevance.
 
@@ -121,9 +121,9 @@ Explicitly listing related knowledge points at the end of a section is not only 
 
 ---
 
-# Advanced Structure and Multi-File System [@advanced-structure]
+# Advanced Structure and Multi-File System
 
-## Case Stage 3: Splitting Single File into Multi-File Structure [@case-stage-3]
+## Case Stage 3: Splitting Single File into Multi-File Structure
 
 As the knowledge base grows, single files become difficult to maintain. We need to split them into a folder structure.
 
@@ -171,21 +171,21 @@ Linear algebra is a branch of mathematics concerning vector spaces and linear ma
 ## (@matrix::matrix)
 ```
 
-## Cross-File References and Subtree Embedding [@subtree-references]
+## Cross-File References and Subtree Embedding
 
 **Subtree References**:
 - **Syntax**: `# (@external_id)`
 - **Purpose**: "Mounts" a section node from an external file (e.g., `matrix.md`) under the current node, making it a subtree.
 - **Example**: `## (@matrix::matrix)` effectively turns the matrix node from `matrix.md` into a child node of `# Linear Algebra` in `index.md`.
 
-## Path Abbreviations and ID Resolution [@path-resolution]
+## Path Abbreviations and ID Resolution
 
 In multi-file systems, node ID format is `file_path::label`. KERAG provides shorthand rules:
 
 - **Relative Paths**: Supports `./` (same directory) and `../` (parent directory).
 - **Root Path**: Starting with `/` indicates lookup from the knowledge base root directory.
 
-### Special Handling of Index Files [@index-special-handling]
+### Special Handling of Index Files
 
 The file ID of **entry files (index.md)** is resolved as the name of their directory:
 
@@ -207,11 +207,11 @@ However, when referencing the index file in the current directory using relative
 
 ---
 
-# Multi-Language Support [@multi-language]
+# Multi-Language Support
 
 KERAG supports multi-language knowledge bases, allowing you to provide different language versions for the same content and automatically select the most appropriate version based on user language preferences.
 
-## File Naming Conventions [@file-naming]
+## File Naming Conventions
 
 Multi-language files are identified by suffixes:
 
@@ -231,7 +231,7 @@ linear-algebra/
 └── matrix.en.md       # English matrix section
 ```
 
-## Language Resolution Priority [@language-priority]
+## Language Resolution Priority
 
 When the system needs to find the physical file corresponding to a `file_id`, it tries in the following priority order:
 
@@ -245,7 +245,7 @@ For directory-type references (e.g., `linear-algebra`):
 1. `linear-algebra/index.en.md` (Priority match current language)
 2. `linear-algebra/index.md` (Fallback to default version)
 
-## File ID Language Independence [@file-id-language]
+## File ID Language Independence
 
 **Important**: Regardless of which language version is used, the file ID remains the same.
 
@@ -254,7 +254,7 @@ For directory-type references (e.g., `linear-algebra`):
 
 This design ensures cross-language reference simplicity and consistency.
 
-## Configuring Language Preference [@language-config]
+## Configuring Language Preference
 
 The system determines the current language through:
 
@@ -266,7 +266,7 @@ The system determines the current language through:
 export KERAG_LANG=en
 ```
 
-## Best Practices [@best-practices-i18n]
+## Best Practices
 
 ### Structural Consistency
 Different language versions should maintain the same section structure and label naming to ensure cross-language references resolve correctly:
@@ -286,9 +286,9 @@ It is recommended to always provide a default language version (files without la
 
 ---
 
-# Module Management, Packaging and Installation [@module-management]
+# Module Management, Packaging and Installation
 
-## Module Scanning and Local Management (Scan) [@module-scan]
+## Module Scanning and Local Management (Scan)
 
 When you create or modify modules locally, run the scan command to update local registration information:
 
@@ -301,7 +301,7 @@ This command performs the following operations:
 2. Parses module metadata from `index.md`.
 3. Generates or updates `.kerag_modules/modules.yml` index file.
 
-## Module Packaging (Pack) [@module-pack]
+## Module Packaging (Pack)
 
 To distribute your knowledge base, you can use the packaging tool to convert it into a standard `.tar` archive file.
 
@@ -321,7 +321,7 @@ kerag tool pack [module directory] [-o output filename] [--name module name] [--
 kerag tool pack ./linear-algebra --name linear-algebra-example --version 1.0.0 -o la-v1.tar
 ```
 
-## Installing External Modules (Install) [@module-install]
+## Installing External Modules (Install)
 
 Besides automatic scanning in KERAG knowledge paths, you can also prepare module directories conforming to specifications in any location and install them into the KERAG system via the `install` command.
 
@@ -366,9 +366,9 @@ kerag install ./module-v2.tar -f
 
 ---
 
-# Auxiliary Tools [@auxiliary-tools]
+# Auxiliary Tools
 
-## Document Splitting Tool [@doc-split]
+## Document Splitting Tool
 
 To quickly convert large Markdown documents into KERAG knowledge structures, we provide the `split` tool. This tool can automatically split long documents by specified heading levels and generate a main index file with subtree references.
 
@@ -444,7 +444,7 @@ output/
 
 This is a powerful tool for quickly building preliminary knowledge trees, especially suitable for processing existing large documents.
 
-## Module Packaging Tool [@module-pack-tool]
+## Module Packaging Tool
 
 The `pack` tool is used to package knowledge modules into distributable archive files. See Module Packaging section for details.
 
@@ -455,11 +455,11 @@ kerag tool pack ./my-module --name my-module --version 1.0.0 -o my-module.tar
 
 ---
 
-# Best Practices Guide [@best-practices]
+# Best Practices Guide
 
 To help you build KERAG knowledge bases with clear structure, easy navigation, and AI-friendly retrieval, we have compiled the following best practices:
 
-## Module and File Organization [@module-organization]
+## Module and File Organization
 
 ### Module Naming Conventions
 
@@ -487,7 +487,7 @@ To help you build KERAG knowledge bases with clear structure, easy navigation, a
 - **Label Matches Filename**: The level 1 section's label should match the filename (excluding extension). For example, file `linear-transformations.md` should contain `# Linear Transformations [@linear-transformations]`.
 - **Benefit**: This one-to-one mapping keeps file structure consistent with node structure, facilitating navigation and maintenance.
 
-## Headings and Hierarchical Structure [@heading-structure]
+## Headings and Hierarchical Structure
 
 ### Logical Hierarchy
 
@@ -502,7 +502,7 @@ To help you build KERAG knowledge bases with clear structure, easy navigation, a
     - Referenced files should preferably be in current directory or subdirectories.
     - Subtree references are the core means of managing large knowledge trees; treat them as tools for "modularizing" documents.
 
-## Naming and ID System [@naming-id]
+## Naming and ID System
 
 ### Label Usage
 
@@ -523,7 +523,7 @@ To help you build KERAG knowledge bases with clear structure, easy navigation, a
 
 - **Short ID References**: Within the same file, you can directly use `(@label)` and the system will automatically complete the current file's path.
 
-## Cross-References and Associations [@cross-references]
+## Cross-References and Associations
 
 ### Inline Links
 
@@ -536,7 +536,7 @@ To help you build KERAG knowledge bases with clear structure, easy navigation, a
 - **Format**: Each line below should strictly follow the `(@node_id): description text` format.
 - **Purpose**: Used to establish strong associations that do not belong to parent-child relationships.
 
-## Content Writing Suggestions [@content-tips]
+## Content Writing Suggestions
 
 ### Code Fences
 
@@ -548,7 +548,7 @@ To help you build KERAG knowledge bases with clear structure, easy navigation, a
 
 ---
 
-# Conclusion [@conclusion]
+# Conclusion
 
 Through this tutorial, you have mastered the entire process of building a multi-file, distributable KERAG module from creating single-node Markdown.
 

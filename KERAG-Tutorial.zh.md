@@ -2,7 +2,7 @@
 <!-- Version: 0.1.0 -->
 <!-- Description: KERAG 教程 - 从零构建结构化知识库 -->
 
-# KERAG 教程 [@kerag-tutorial]
+# KERAG 教程
 
 本教程将通过一个贯穿始终的案例——**构建线性代数 (Linear Algebra) 知识库**——带领你由浅入深地掌握 KERAG (Knowledge Explorer Retrieval Augmented Generation) 的核心概念与操作流程。
 
@@ -10,9 +10,9 @@
 
 ---
 
-# 核心概念与单文件结构 [@core-concepts]
+# 核心概念与单文件结构
 
-## 案例阶段 1：创建一个简单的单文件知识库 [@case-stage-1]
+## 案例阶段 1：创建一个简单的单文件知识库
 
 在 KERAG 中，我们将markdown文本解析为节点与知识树进行检阅。
 
@@ -37,7 +37,7 @@
 <!-- 注释会被节点树构建逻辑直接忽略，目前只支持单行注释 -->
 ```
 
-## 节点类型 [@node-types]
+## 节点类型
 
 在这个简单的例子中，已经包含了 KERAG 的两种核心节点类型：
 
@@ -52,7 +52,7 @@
 - **归属**: 每个内容块都属于它上方最近的一个章节节点。
 - **示例**: "向量是具有大小和方向的量。" 是属于 `## 向量` 节点的内容。
 
-## 树状结构可视化 [@tree-visualization]
+## 树状结构可视化
 
 KERAG 会将上述文件解析为如下的逻辑树状结构：
 
@@ -70,9 +70,9 @@ KERAG 会将上述文件解析为如下的逻辑树状结构：
 
 ---
 
-# 基础语法 [@basic-syntax]
+# 基础语法
 
-## 案例阶段 2：为知识库添加标签和链接 [@case-stage-2]
+## 案例阶段 2：为知识库添加标签和链接
 
 为了让知识点之间建立联系，我们需要使用 KERAG 的扩展语法。现在让我们升级 `linear-algebra/index.md`。
 
@@ -97,7 +97,7 @@ KERAG 会将上述文件解析为如下的逻辑树状结构：
 (@/calculus/multivariate::gradient)
 ```
 
-## 标签 (Labels) [@labels]
+## 标签 (Labels)
 
 有的时候我们需要在其它地方引用某些章节或内容，**标签**提供了引用章节的方法。
 
@@ -105,14 +105,14 @@ KERAG 会将上述文件解析为如下的逻辑树状结构：
 - **作用**: 指定该节点的唯一标识符后缀。
 - **示例**: `## 矩阵 [@matrix]` 的节点 标签即是`matrix`。
 
-## 行内链接 (Inline Links) [@inline-links]
+## 行内链接 (Inline Links)
 
 在正文中引用其他节点，构建知识网络。
 
 - **语法**: `(@node_id)` 或 `(@label)` (在同一文件中可简写)。
 - **示例**: `请参阅 (@vector)` 会创建一个指向向量节点的超链接。
 
-## 参见块 (See Also) [@see-also]
+## 参见块 (See Also)
 
 在章节末尾显式列出相关联的知识点，不仅对读者友好，也能增强 RAG 检索的相关性。
 
@@ -121,9 +121,9 @@ KERAG 会将上述文件解析为如下的逻辑树状结构：
 
 ---
 
-# 高级结构与多文件系统 [@advanced-structure]
+# 高级结构与多文件系统
 
-## 案例阶段 3：将单文件拆分为多文件结构 [@case-stage-3]
+## 案例阶段 3：将单文件拆分为多文件结构
 
 随着知识库的增长，单文件变得难以维护。我们需要将其拆分为文件夹结构。
 
@@ -171,21 +171,21 @@ linear-algebra/
 ## (@matrix::matrix)
 ```
 
-## 跨文件引用与子树嵌入 [@subtree-references]
+## 跨文件引用与子树嵌入
 
 **子树嵌入 (Subtree References)**:
 - **语法**: `# (@external_id)`
 - **作用**: 将外部文件（如 `matrix.md`）中的某个章节节点，"挂载"到当前节点下，成为其子树。
 - **示例**: `## (@matrix::matrix)` 实际上把 `matrix.md` 的中的matrix节点变成了 `index.md` 中 `# 线性代数` 的子节点。
 
-## 路径简写与 ID 解析 [@path-resolution]
+## 路径简写与 ID 解析
 
 在多文件系统中，节点 ID 格式为 `file_path::label`。KERAG 提供了简写规则：
 
 - **相对路径**: 支持 `./` (同级目录) 和 `../` (上级目录)。
 - **根路径**: `/` 开头表示从知识库根目录开始查找。
 
-### Index 文件的特殊处理 [@index-special-handling]
+### Index 文件的特殊处理
 
 **入口文件 (index.md)** 的文件 ID 会被解析为其所在目录的名称：
 
@@ -207,11 +207,11 @@ linear-algebra/
 
 ---
 
-# 多语言支持 [@multi-language]
+# 多语言支持
 
 KERAG 支持多语言知识库，允许你为同一内容提供不同语言版本，并根据用户的语言偏好自动选择最合适的版本。
 
-## 文件命名约定 [@file-naming]
+## 文件命名约定
 
 多语言文件通过后缀标识语言版本：
 
@@ -231,7 +231,7 @@ linear-algebra/
 └── matrix.en.md       # 英文版矩阵章节
 ```
 
-## 语言解析优先级 [@language-priority]
+## 语言解析优先级
 
 当系统需要查找某个 `file_id` 对应的物理文件时，会按照以下优先级顺序尝试：
 
@@ -245,7 +245,7 @@ linear-algebra/
 1. `linear-algebra/index.zh.md` （优先匹配当前语言）
 2. `linear-algebra/index.md` （回退到默认版本）
 
-## 文件 ID 与语言无关性 [@file-id-language]
+## 文件 ID 与语言无关性
 
 **重要**: 无论使用哪种语言版本，文件 ID 都是相同的。
 
@@ -254,7 +254,7 @@ linear-algebra/
 
 这种设计确保了跨语言引用的简洁性和一致性。
 
-## 配置语言偏好 [@language-config]
+## 配置语言偏好
 
 系统通过以下方式确定当前语言：
 
@@ -266,7 +266,7 @@ linear-algebra/
 export KERAG_LANG=zh
 ```
 
-## 最佳实践 [@best-practices-i18n]
+## 最佳实践
 
 ### 结构一致性
 不同语言版本的文件应该保持相同的章节结构和标签命名，确保跨语言引用能够正确解析：
@@ -286,9 +286,9 @@ A matrix is a rectangular array of complex or real numbers.
 
 ---
 
-# 模块管理、打包与安装 [@module-management]
+# 模块管理、打包与安装
 
-## 模块扫描与本地管理 (Scan) [@module-scan]
+## 模块扫描与本地管理 (Scan)
 
 当你在本地创建或修改了模块，运行扫描命令来更新本地注册信息：
 
@@ -301,7 +301,7 @@ kerag scan
 2. 从`index.md`中解析模块元数据。
 3. 生成或更新 `.kerag_modules/modules.yml` 索引文件
 
-## 模块打包 (Pack) [@module-pack]
+## 模块打包 (Pack)
 
 为了分发你的知识库，你可以使用打包工具将其转换为标准的 `.tar` 归档文件。
 
@@ -321,7 +321,7 @@ kerag tool pack [模块目录] [-o 输出文件名] [--name 模块名] [--versio
 kerag tool pack ./linear-algebra --name linear-algebra-example --version 1.0.0 -o la-v1.tar
 ```
 
-## 安装外部模块 (Install) [@module-install]
+## 安装外部模块 (Install)
 
 除了在 KERAG 知识路径中自动扫描，你也可以在任何路径下准备好符合规范的模块目录，然后通过 `install` 命令将其安装到 KERAG 系统中。
 
@@ -366,9 +366,9 @@ kerag install ./module-v2.tar -f
 
 ---
 
-# 辅助工具 [@auxiliary-tools]
+# 辅助工具
 
-## 文档分割工具 [@doc-split]
+## 文档分割工具
 
 为了快速将大型 Markdown 文档转换为 KERAG 知识结构，我们提供了 `split` 工具。这个工具可以自动将长文档按指定标题级别分割成多个文件，并生成带有子树引用的主索引文件。
 
@@ -444,7 +444,7 @@ output/
 
 这是一个快速构建初步知识树的有力工具，特别适合处理已有的大型文档。
 
-## 模块打包工具 [@module-pack-tool]
+## 模块打包工具
 
 `pack` 工具用于将知识模块打包为可分发的归档文件，详见(@module-pack::module-pack)部分。
 
@@ -455,11 +455,11 @@ kerag tool pack ./my-module --name my-module --version 1.0.0 -o my-module.tar
 
 ---
 
-# 最佳实践指南 [@best-practices]
+# 最佳实践指南
 
 为了帮助你构建结构清晰、易于导航且利于 AI 检索的 KERAG 知识库，我们整理了以下最佳实践：
 
-## 模块与文件组织 [@module-organization]
+## 模块与文件组织
 
 ### 模块命名规范
 
@@ -487,7 +487,7 @@ kerag tool pack ./my-module --name my-module --version 1.0.0 -o my-module.tar
 - **标签与文件名一致**：该一级章节的标签应与文件名（除后缀外）相同。例如，文件 `linear-transformations.md` 应包含 `# 线性变换 [@linear-transformations]`。
 - **好处**：这种一对一的映射关系使文件结构与节点结构保持一致，便于导航和维护。
 
-## 标题与层级结构 [@heading-structure]
+## 标题与层级结构
 
 ### 逻辑层级
 
@@ -502,7 +502,7 @@ kerag tool pack ./my-module --name my-module --version 1.0.0 -o my-module.tar
     - 被引用的文件最好位于当前目录或子目录下。
     - 子树引用是管理大型知识树的核心手段，应将其视为"模块化"文档的工具。
 
-## 命名与 ID 系统 [@naming-id]
+## 命名与 ID 系统
 
 ### 标签 (Labels) 的使用
 
@@ -523,7 +523,7 @@ kerag tool pack ./my-module --name my-module --version 1.0.0 -o my-module.tar
 
 - **短 ID 引用**：在同一个文件内，可以直接使用 `(@label)`，系统会自动补全当前文件的路径。
 
-## 交叉引用与关联 [@cross-references]
+## 交叉引用与关联
 
 ### 行内链接 (Inline Links)
 
@@ -536,7 +536,7 @@ kerag tool pack ./my-module --name my-module --version 1.0.0 -o my-module.tar
 - **格式**：下方每行应为严格的 `(@node_id): 描述文本` 格式。
 - **作用**：用于建立强关联但不属于父子关系的逻辑连接。
 
-## 内容编写建议 [@content-tips]
+## 内容编写建议
 
 ### 代码围栏 (Code Fences)
 
@@ -548,7 +548,7 @@ kerag tool pack ./my-module --name my-module --version 1.0.0 -o my-module.tar
 
 ---
 
-# 结语 [@conclusion]
+# 结语
 
 通过本教程，你已经掌握了从创建单节点 Markdown 到构建多文件、可分发的 KERAG 模块的全过程。
 
