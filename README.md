@@ -1,8 +1,10 @@
 # KERAG (Knowledge Explorer Retrieval Augmented Generation)
 
-KERAG is a tool designed to **structurally organize, package, and distribute** systematic knowledge (such as notes, bibliographies, and experience summaries) while providing an **AI access interface**.
+KERAG is a tool designed to structurally organize and package systematic knowledge (such as notes, bibliographies, and accumulated experiences) for distribution, while providing a dedicated AI access interface.
 
-The key difference between KERAG and traditional RAG is that it doesn’t just "chunk" documents into pieces. Instead, it parses Markdown files into a logical "Knowledge Tree." This structure allows AI Agents to navigate through hierarchies—much like a human flipping through a textbook's table of contents—to achieve precise knowledge positioning and retrieval.
+When handling domain-specific tasks, an Agent's performance often depends on the background knowledge it can access. If an Agent is provided with a set of highly organized and logically clear reference materials, its effectiveness improves significantly. Much like how we reuse modules from pip or npm, we believe "knowledge" should also be something that can be downloaded, installed, and reused. KERAG aims to achieve this "Knowledge Modularization," turning systematically organized expertise into distributable and assemblable assets, thereby empowering Agents to better tackle tasks across various fields.
+
+Furthermore, for highly structured domain knowledge, we have adopted a style that parses Markdown files into a "Knowledge Tree" with logical hierarchies. This structure allows AI Agents to navigate through levels—much like a human flipping through a textbook's table of contents—to precisely locate and retrieve information. This approach serves as a powerful complement to traditional Vector Retrieval-based RAG.
 
 ## Core Features
 
