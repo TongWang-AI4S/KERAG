@@ -275,7 +275,10 @@ class KnowledgeManager:
         def load_modules_from_root(root_path: Path):
             config_path = root_path / "modules.yml"
             if not config_path.exists():
-                raise FileNotFoundError(f"Modules config not found: {config_path}")
+                # Auto-create empty modules.yml if not exists
+                config_path.parent.mkdir(parents=True, exist_ok=True)
+                with open(config_path, 'w', encoding='utf-8') as f:
+                    yaml.dump({}, f)
 
             try:
                 with open(config_path, 'r', encoding='utf-8') as f:
