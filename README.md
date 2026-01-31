@@ -1,6 +1,39 @@
 # KERAG (Knowledge Explorer Retrieval Augmented Generation)
 
-KERAG is a powerful system designed to transform Markdown files with custom syntax into a hierarchical, cross-referenced knowledge-tree structure for knowledge retrieval and AI-driven exploration.
+KERAG is a tool designed to **structurally organize, package, and distribute** systematic knowledge (such as notes, bibliographies, and experience summaries) while providing an **AI access interface**.
+
+The key difference between KERAG and traditional RAG is that it doesn’t just "chunk" documents into pieces. Instead, it parses Markdown files into a logical "Knowledge Tree." This structure allows AI Agents to navigate through hierarchies—much like a human flipping through a textbook's table of contents—to achieve precise knowledge positioning and retrieval.
+
+## Core Features
+
+* **Structured Knowledge Tree**: Transforms linear Markdown documents into a navigable node tree, preserving the logical hierarchy between chapters.
+* **Extended Markdown Syntax**:
+  * `[@label]`: Defines a node anchor label.
+  * `(@node_id)`: Creates a cross-reference.
+  * `## (@referred_node_id)`: Directly embeds an entire subtree via reference.
+* **Knowledge Package Management**: Follows `pip`-like logic, supporting the `pack`, sharing, and `install` of knowledge bases.
+* **Dual Scoping**: Supports both Global and Local (project-specific) knowledge base management.
+* **Integration Support**: Provides a web inspector (KERAG-Web) and a standard MCP interface (KERAG-MCP).
+
+## Scope of Application
+
+KERAG is specifically designed for highly structured, hierarchical content:
+
+**Best For:**
+
+* **Technical Documentation:** Code documentation, API reference manuals.
+* **Educational Materials:** Structured tutorials, textbooks, academic notes.
+* **Knowledge Bases:** Personal experience summaries, encyclopedia entries.
+* **Hierarchical Documents:** Any content with a clear structure of parts, chapters, and sections.
+
+**Not Recommended For:**
+
+* **Narrative Content:** Novels, essays, or plot-driven stories.
+* **Unstructured Documents:** Single news reports or casual blog posts.
+* **Streaming Logs:** Chat history, meeting transcripts.
+* **Fragmented Information:** Any flat content lacking clear hierarchical logic.
+
+---
 
 ## Installation
 
@@ -10,50 +43,46 @@ You can install the core library directly from GitHub:
 pip install git+https://github.com/TongWang-AI4S/KERAG.git
 ```
 
-## Key Features
+## Quickly Building a Knowledge Tree
 
-- **Hierarchical Node Structure**: Transforms linear Markdown into a navigable tree.
-- **Custom Syntax**:
-    - `[@label]`: Define node anchors.
-    - `(@node_id)`: Create cross-references.
-    - `## (@referred_node_id)`: Embed subtrees.
-
-## Quick Knowledge Tree Building
-
-Use the `kerag tool split` command to quickly build a preliminary knowledge tree from a large Markdown document:
+Use the `kerag tool split` command to quickly build an initial knowledge tree from a large Markdown document:
 
 ```bash
-# Split a document at ### level (default)
+# Split document at the ### level (default)
 kerag tool split my-document.md
 
-# Split at ## level and output to custom directory
+# Split at the ## level and output to a custom directory
 kerag tool split my-document.md -l 2 -o my-knowledge-base
 
-# Auto-add labels to all headings
+# Automatically add labels to all headers
 kerag tool split my-document.md --all-labeled
+
 ```
 
 This command will:
-- Create a main `index.md` file with subtree references
-- Generate separate files for each section at the specified heading level
-- Automatically adjust heading levels in sub-files
 
-## Knowledge Base Directories & Scopes
+* Create a master `index.md` file with subtree references.
+* Generate independent files for each section at the specified header level.
+* Automatically adjust header hierarchies within sub-files.
 
-KERAG supports two scopes for knowledge base management, allowing you to flexibly organize general and project-specific knowledge:
+## Directories and Scopes
 
-- **Global Scope**: Default path is `~/.kerag_modules`. Used for general knowledge modules accessible across all projects.
-- **Local Scope**: Default path is `./.kerag_modules` in the current working directory. Used for specialized knowledge modules relevant only to the current project.
+KERAG allows you to flexibly organize general and project-specific knowledge:
+
+* **Global Scope**: Default path is `~/.kerag_modules`. Stores general knowledge modules accessible to all projects.
+* **Local Scope**: Default path is `./.kerag_modules` in the current working directory. Stores specialized modules relevant only to the current project.
 
 ### Environment Configuration
-You can customize the directory paths using the following environment variables:
-- `KERAG_HOME`: Customize the global scope root directory.
-- `KERAG_LOCAL`: Customize the local scope root directory.
+
+* `KERAG_HOME`: Customize the root directory for the Global scope.
+* `KERAG_LOCAL`: Customize the root directory for the Local scope.
 
 ### Scope Switching
-When executing module management commands (e.g., `install`, `list`, `scan`, `remove`), you can specify the scope using these flags:
-- `-g` or `--global`: Target the global scope.
-- `-l` or `--local`: Target the local scope.
+
+When executing management commands (such as `install`, `list`, `scan`, `remove`), you can specify the scope via arguments:
+
+* `-g` or `--global`: Operations on the Global scope.
+* `-l` or `--local`: Operations on the Local scope.
 
 ## Minimal Example
 
@@ -65,22 +94,26 @@ Create a file named `index.md`:
 Linear algebra is the branch of mathematics concerning vector spaces.
 
 ## Vectors [@vector]
-Vectors are quantities with both magnitude and direction.
+A vector is a quantity having direction as well as magnitude.
 
 ## See Also
-(@vector): Introduction to vectors
+(@vector): Introduction to Vectors
+
 ```
 
 ## Module Management
 
 ### Packing a Module
-To distribute your knowledge base, pack it into a `.tar` archive:
+
+To distribute your knowledge base, use the `kerag tool pack` utility to compress it into a `.tar` archive:
 
 ```bash
 kerag tool pack ./my-module --name my-module --version 1.0.0 -o my-module.tar
+
 ```
 
 ### Installing a Module
+
 You can install modules from local paths, URLs, or Git repositories:
 
 ```bash
@@ -92,38 +125,46 @@ kerag install https://example.com/module.tar
 
 # Install from a GitHub repository
 kerag install git+https://github.com/username/kerag-module.git
+
 ```
 
-## Knowledge Base Viewing & AI Search
+## Inspection and AI Search
 
-KERAG provides companion projects for knowledge base exploration and AI-driven search.
+KERAG provides companion projects for visualization and AI-driven search.
 
 | Project | Description | Link |
-|---------|-------------|------|
-| **KERAG Web** | Visual knowledge explorer with web interface | [TongWang-AI4S/kerag-web](https://github.com/TongWang-AI4S/kerag-web) |
-| **KERAG MCP** | MCP server for AI assistant integration | [TongWang-AI4S/kerag-mcp](https://github.com/TongWang-AI4S/kerag-mcp) |
-| **KERAG Modules** | Pre-built knowledge base modules (tar archives ready to install) | [TongWang-AI4S/KERAG-Modules](https://github.com/TongWang-AI4S/KERAG-Modules) |
+| --- | --- | --- |
+| **KERAG Web** | Visual knowledge browser (Web UI) | [TongWang-AI4S/kerag-web](https://github.com/TongWang-AI4S/kerag-web) |
+| **KERAG MCP** | AI Assistant integration (MCP Server) | [TongWang-AI4S/kerag-mcp](https://github.com/TongWang-AI4S/kerag-mcp) |
 
-### KERAG Web - Visual Knowledge Explorer
-A modern web interface for browsing and searching your knowledge base.
+### KERAG Web - Visual Inspector
 
-**Install and run:**
+A local web interface for inspecting your knowledge base.
+
+**Install and Run:**
+
 ```bash
 pip install git+https://github.com/TongWang-AI4S/kerag-web.git
 kerag-web
+
 ```
-Visit http://localhost:8001 to browse your knowledge base with tree navigation, full-text search, and rich content display.
+
+Access http://localhost:8001 to browse your knowledge base via tree navigation and full-text search.
 
 ### KERAG MCP - AI Assistant Integration
-An MCP (Model Context Protocol) server that enables AI assistants to access and navigate your knowledge base.
+
+An MCP (Model Context Protocol) server that enables AI assistants (e.g., Claude Code, Cursor) to access and navigate your knowledge base.
 
 **Install:**
+
 ```bash
 pip install git+https://github.com/TongWang-AI4S/kerag-mcp.git
+
 ```
 
-**Configure in your AI client (e.g., Claude Code):**
-Add to `.mcp.json`:
+**Configuration (e.g., Claude Code):**
+Add the following to the `mcpServers` field in your configuration file:
+
 ```json
 {
   "mcpServers": {
@@ -133,20 +174,14 @@ Add to `.mcp.json`:
     }
   }
 }
+
 ```
 
-This allows AI assistants to search and retrieve precise context from your knowledge base.
-
-### KERAG Modules - Pre-built Knowledge Bases
-A collection of ready-to-use knowledge base modules packaged as `.tar` archives. Install directly without building from source.
-
-**Install a pre-built module:**
-```bash
-# Install from the GitHub repository
-kerag install https://github.com/TongWang-AI4S/KERAG-Modules/releases/heads/main/module-name.tar
-```
-
-Browse the [KERAG-Modules repository](https://github.com/TongWang-AI4S/KERAG-Modules) to find available knowledge bases.
+> In the repository [KERAG-Modules](https://github.com/TongWang-AI4S/KERAG-Modules), I share knowledge modules I’ve generated. You can install them directly into your KERAG environment.
+> ```bash
+> kerag install https://raw.githubusercontent.com/TongWang-AI4S/KERAG-Modules/refs/heads/main/example/module-name.tar
+> 
+> ``` 
 
 ## License
 
