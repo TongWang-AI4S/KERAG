@@ -193,31 +193,36 @@ class KERAGShell(cmd.Cmd):
 
     def do_search(self, arg):
         """Search for keywords.
-        Usage: search <keyword> [scope] [-r]
+        Usage: search <keyword> [search_under] [-r] [--order {priority,dfs}]
         """
         parser = argparse.ArgumentParser(prog="search")
         parser.add_argument("keyword")
-        parser.add_argument("scope", nargs="?", default="all")
+        parser.add_argument("search_under", nargs="?", help="Optional node ID to search under")
         parser.add_argument("-r", "--regex", action="store_true")
+        parser.add_argument("-o", "--order", choices=["priority", "dfs"], default="priority", help="Sort order")
 
         try:
             args = parser.parse_args(shlex.split(arg))
         except SystemExit:
             return
         except Exception:
-            print("Usage: search <keyword> [scope] [-r]")
+            print("Usage: search <keyword> [search_under] [-r] [-o order]")
             return
 
-        res = self.api.search(args.keyword, scope=args.scope, use_regex=args.regex)
+        res = self.api.search(args.keyword, search_under=args.search_under, use_regex=args.regex, order=args.order)
         if not res.get("success"):
             print(f"Error: {res.get('error')}")
             return
 
         results = res["data"]
         total = res.get("metadata", {}).get("total", len(results))
-        print(f"Found {total} results for '{args.keyword}' in scope '{args.scope}':")
+        scope_msg = f" in subtree '{args.search_under}'" if args.search_under else " globally"
+        print(f"Found {total} results for '{args.keyword}'{scope_msg} (order: {args.order}):")
         for i, r in enumerate(results):
-            print(f"  {i+1}. [{r['type']}] {r['label']} ({r['node_id']}) - {r.get('title', '')}")
+            score_info = f" [Score: {r['score']}]" if 'score' in r and args.order == "priority" else ""
+            print(f"  {i+1}. [{r['type']}] {r['label']} ({r['node_id']}) - {r.get('title', '')}{score_info}")
+            if 'excerpt' in r:
+                print(f"     {r['excerpt']}")
 
     def do_grep(self, arg):
         """Alias for search."""

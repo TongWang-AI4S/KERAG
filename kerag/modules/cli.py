@@ -90,7 +90,7 @@ def handle_list(manager: ModuleManager, args):
 
             # 截断描述至50个字符
             if len(description) > 50:
-                description = description[:47] + "..."
+                description = description[:47] + " ... ... "
 
             print(f"  {name:<{name_col_width}}{version:<{version_col_width}}{description}")
 
@@ -119,7 +119,7 @@ def handle_scan(manager: ModuleManager, args):
             display = f"{name}"
             if version: display += f", version={version}"
             if desc:
-                d_short = desc[:30] + "..." if len(desc) > 30 else desc
+                d_short = desc[:30] + " ... ... " if len(desc) > 30 else desc
                 display += f", desc={d_short}"
             print(f"    * {display}")
     if to_remove:

@@ -18,7 +18,7 @@ class ExplorerOptions:
     include_content: bool = True
     include_see_also: bool = True
     max_depth: int = 3
-    content_preview_length: int = 50
+    content_preview_length: int = 100
     language: str = "zh"
     exclude_modules: List[str] = field(default_factory=list)
     cache_size: int = 100
@@ -70,7 +70,7 @@ class KnowledgeExplorer:
             if cached["type"] == "section":
                 return cached["title"]
             else:
-                return cached["content"][:50] + "..." if len(cached["content"]) > 50 else cached["content"]
+                return cached["content"][:50] + " ... ... " if len(cached["content"]) > 50 else cached["content"]
 
         node = self.km.get_node(node_id)
         if not node:
@@ -79,7 +79,7 @@ class KnowledgeExplorer:
         if node["node_type"] == "section":
             return node["title"]
         else:
-            return node["content"][:50] + "..." if len(node["content"]) > 50 else node["content"]
+            return node["content"][:50] + " ... ... " if len(node["content"]) > 50 else node["content"]
 
     def _make_node_dict(self, node: Dict[str, Any]) -> Dict[str, Any]:
         """Convert a node data dictionary to explorer internal format."""
@@ -232,6 +232,10 @@ class KnowledgeExplorer:
         # Create a copy to avoid cache pollution when adding children
         node_dict = cached_node.copy()
 
+        # If depth == 0 and it's a section, add content_preview (preview mode)
+        if depth == 0 and node_dict["type"] == "section":
+            node_dict["content_preview"] = self._get_section_content_preview(node_dict)
+
         # If depth > 0 and it's a section, get children
         if depth > 0 and node_dict["type"] == "section":
             actual_node = self.km.get_node(target_id)
@@ -277,11 +281,13 @@ class KnowledgeExplorer:
                 }
                 if child_dict["type"] == "section":
                     preview_dict["title"] = child_dict.get("title", "")
+                    # 新增: 为section节点获取第一个content子节点的预览
+                    preview_dict["content_preview"] = self._get_section_content_preview(child_dict)
                 else:
                     content = child_dict.get("content", "")
                     limit = self.options.content_preview_length
                     if len(content) > limit:
-                        preview_dict["content_preview"] = content[:limit-8] + "..." + content[-5:]
+                        preview_dict["content_preview"] = content[:limit-8] + " ... ... " + content[-5:]
                     else:
                         preview_dict["content_preview"] = content
 
@@ -419,11 +425,13 @@ class KnowledgeExplorer:
                 item["literal_level"] = child_dict["literal_level"]
                 item["children_ids"] = child_dict.get("children_ids", [])
                 item["has_children"] = child_dict.get("has_children", False)
+                # 新增: 为section节点获取第一个content子节点的预览
+                item["content_preview"] = self._get_section_content_preview(child_dict)
             else:
                 limit = self.options.content_preview_length
                 content = child_dict["content"]
                 if len(content) > limit:
-                    item["content_preview"] = content[:limit-8] + "..." + content[-5:]
+                    item["content_preview"] = content[:limit-8] + " ... ... " + content[-5:]
                 else:
                     item["content_preview"] = content
 
@@ -448,6 +456,33 @@ class KnowledgeExplorer:
                 "sort_by": sort_by
             }
         }
+
+    def _get_section_content_preview(self, section_dict: Dict[str, Any]) -> str:
+        """获取section节点的内容预览。
+
+        如果section的第一个孩子是content节点，则返回该content的内容预览。
+        否则返回空字符串。
+
+        Args:
+            section_dict: section节点的字典数据
+
+        Returns:
+            内容预览字符串或空字符串
+        """
+        children_ids = section_dict.get("children_ids", [])
+        if not children_ids:
+            return ""
+
+        # 获取第一个孩子
+        first_child = self._get_cached_or_build(children_ids[0])
+        if first_child and first_child["type"] == "content":
+            content = first_child["content"]
+            limit = self.options.content_preview_length
+            if len(content) > limit:
+                return content[:limit-8] + " ... ... " + content[-5:]
+            return content
+
+        return ""
 
     def _resolve_target_id(self, target: str) -> Dict[str, Any]:
         """Resolve a target string to a node ID.
@@ -843,28 +878,46 @@ class KnowledgeExplorer:
             "access_count": self._access_count.get(self.current_node_id, 0)
         }
 
-    def search_nodes(self, query: Union[str, List[str]], scope: str = "all", max_results: int = 50,
-                     whole_word: bool = False, case_sensitive: bool = False, use_regex: bool = False) -> Dict[str, Any]:
+    def search_nodes(self, query: Union[str, List[str]], search_under: Optional[str] = None, max_results: int = 50,
+                     whole_word: bool = False, case_sensitive: bool = False, use_regex: bool = False,
+                     order: str = "priority") -> Dict[str, Any]:
         """Search for nodes containing the query text(s) via NodeSearcher.
 
         Args:
             query: Search query text or list of query texts
-            scope: Search scope "all" | "title" | "content" | "label"
+            search_under: Optional root node ID to restrict search scope
             max_results: Maximum number of results to return
             whole_word: Whether to match whole words only
             case_sensitive: Whether the search is case sensitive
             use_regex: Whether to treat query as a regular expression
+            order: "priority" or "dfs"
 
         Returns:
             Dictionary containing search results
         """
+        # Resolve search_under if provided
+        resolved_search_under = None
+        if search_under:
+            resolved = self._resolve_target_id(search_under)
+            if "id" in resolved:
+                resolved_search_under = resolved["id"]
+            elif "error" in resolved:
+                return {"error": {"type": "resolution_failed", "message": resolved["error"]}}
+            elif resolved.get("type") == "ambiguous":
+                return {
+                    "type": "ambiguous_target",
+                    "query": search_under,
+                    "candidates": resolved["candidates"]
+                }
+
         return self.searcher.search(
             query=query,
-            scope=scope,
+            search_under=resolved_search_under,
             max_results=max_results,
             whole_word=whole_word,
             case_sensitive=case_sensitive,
-            use_regex=use_regex
+            use_regex=use_regex,
+            order=order
         )
 
     def set_filter(self, options: Dict[str, Any]) -> Dict[str, Any]:
@@ -1028,7 +1081,7 @@ class KnowledgeExplorer:
                 if node["node_type"] == "section":
                     title = node["title"]
                 else:
-                    title = node["content"][:50] + "..." if len(node["content"]) > 50 else node["content"]
+                    title = node["content"][:50] + " ... ... " if len(node["content"]) > 50 else node["content"]
 
                 results.append({
                     "node_id": node_id,

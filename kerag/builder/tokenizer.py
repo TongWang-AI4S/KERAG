@@ -41,7 +41,7 @@ class Tokenizer:
     COMMENT_PATTERN = re.compile(r'^\s*<!--.*?-->\s*$')
 
     # Code fence start: ```[lang]
-    CODE_FENCE_START = re.compile(r'^\s*```(\w*)\s*$')
+    CODE_FENCE_START = re.compile(r'^\s*```\s*([^\s]+(?: [^\s]+)*)\s*$')
 
     # Code fence end: ```
     CODE_FENCE_END = re.compile(r'^\s*```\s*$')

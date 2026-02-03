@@ -32,17 +32,20 @@ class NodeSearcher:
             return bool(re.search(pattern, text, flags=0 if case_sensitive else re.IGNORECASE))
         return q in text
 
-    def search(self, query: Union[str, List[str]], scope: str = "all", max_results: int = 50,
-               whole_word: bool = False, case_sensitive: bool = False, use_regex: bool = False) -> Dict[str, Any]:
+    def search(self, query: Union[str, List[str]], search_under: Optional[str] = None,
+               max_results: int = 50, whole_word: bool = False,
+               case_sensitive: bool = False, use_regex: bool = False,
+               order: str = "priority") -> Dict[str, Any]:
         """Search for nodes containing the query text(s).
-        
+
         Args:
             query: Search query text or list of query texts
-            scope: Search scope "all" | "title" | "content" | "label"
+            search_under: Optional root node ID to restrict search scope
             max_results: Maximum number of results to return
             whole_word: Whether to match whole words only
             case_sensitive: Whether the search is case sensitive
             use_regex: Whether to treat query as a regular expression
+            order: "priority" (sort by relevance) or "dfs" (sort by document order)
 
         Returns:
             Dictionary containing search results
@@ -60,7 +63,7 @@ class NodeSearcher:
         if not all(isinstance(q, str) for q in queries):
             return {"error": {"type": "invalid_query", "message": "Queries must be strings"}}
 
-        query_key = (tuple(sorted(queries)), scope, max_results, whole_word, case_sensitive, use_regex)
+        query_key = (tuple(sorted(queries)), search_under, max_results, whole_word, case_sensitive, use_regex, order)
 
         # Check cache
         if query_key in self._search_cache:
@@ -69,9 +72,19 @@ class NodeSearcher:
         results = []
         seen_ids = set()
 
-        # Iterate through all nodes in KnowledgeManager
-        for node_id in self.km.nodes:
-            if len(results) >= max_results:
+        # Determine nodes to search
+        if search_under:
+            candidate_nodes = self.km.get_subtree_nodes(search_under)
+        else:
+            # Iterating km.nodes keys. Note: order is insertion order.
+            candidate_nodes = list(self.km.nodes.keys())
+
+        scored_results = []
+
+        # Iterate through all nodes
+        for node_id in candidate_nodes:
+            # Optimization: If we have enough results and order is DFS, we could stop.
+            if order == "dfs" and len(scored_results) >= max_results:
                 break
 
             if node_id in seen_ids:
@@ -81,51 +94,50 @@ class NodeSearcher:
             if node is None:
                 continue
 
-            # Check if ANY query matches at least one field in the node (within scope)
-            any_query_matched = False
+            # Check match and calculate score
+            max_score = 0
+            matched = False
+
+            is_section = node.get("node_type") == "section"
+            title = node.get("title", "") if is_section else ""
+            content = node.get("content", "") if not is_section else ""
+            label = node.get("label", "")
+
             for q in queries:
-                q_matched = False
+                q_score = 0
 
-                # Check title
-                if scope in ["all", "title"] and node.get("node_type") == "section":
-                    text_to_check = node.get("title", "")
-                    if self._matches_query(text_to_check, q, whole_word, case_sensitive, use_regex):
-                        q_matched = True
+                # Check title (Score: 3)
+                if title and self._matches_query(title, q, whole_word, case_sensitive, use_regex):
+                    q_score = max(q_score, 3)
 
-                # Check content
-                if not q_matched and scope in ["all", "content"] and node.get("node_type") == "content":
-                    text_to_check = node.get("content", "")
-                    if self._matches_query(text_to_check, q, whole_word, case_sensitive, use_regex):
-                        q_matched = True
+                # Check content (Score: 2)
+                if content and self._matches_query(content, q, whole_word, case_sensitive, use_regex):
+                    q_score = max(q_score, 2)
 
-                # Check label
-                if not q_matched and scope in ["all", "label"]:
-                    text_to_check = node.get("label", "")
-                    if self._matches_query(text_to_check, q, whole_word, case_sensitive, use_regex):
-                        q_matched = True
+                # Check label (Score: 1)
+                if label and self._matches_query(label, q, whole_word, case_sensitive, use_regex):
+                    q_score = max(q_score, 1)
 
-                if q_matched:
-                    any_query_matched = True
-                    break
+                if q_score > 0:
+                    matched = True
+                    max_score = max(max_score, q_score)
 
-            if any_query_matched:
+            if matched:
                 # Build result info
-                is_section = node["node_type"] == "section"
-
                 result = {
                     "node_id": node_id,
-                    "label": node.get("label", node_id.split("::")[-1]),
-                    "title": node.get("title", "") if is_section else "",
+                    "label": label or node_id.split("::")[-1],
+                    "title": title,
                     "type": "section" if is_section else "content",
                     "file_id": node["file_id"],
+                    "score": max_score
                 }
 
                 # Provide excerpt and preview
                 if not is_section:
-                    content = node.get("content", "")
-                    # Preview is the beginning of the content with last 5 chars preserved when truncated
+                    # Content preview
                     if len(content) > 100:
-                        result["content_preview"] = content[:92] + "..." + content[-5:]
+                        result["content_preview"] = content[:92] + " ... ... " + content[-5:]
                     else:
                         result["content_preview"] = content
 
@@ -134,13 +146,17 @@ class NodeSearcher:
                     if use_regex:
                         result["excerpt"] = result["content_preview"]
                     else:
-                        pos = content.lower().find(excerpt_q.lower()) if not case_sensitive else content.find(excerpt_q)
+                        search_text = content.lower() if not case_sensitive else content
+                        search_q = excerpt_q.lower() if not case_sensitive else excerpt_q
+                        pos = search_text.find(search_q)
+
                         if pos != -1:
                             start = max(0, pos - 40)
                             end = min(len(content), pos + len(excerpt_q) + 60)
-                            result["excerpt"] = (content[start:end]).strip()
-                            if start > 0: result["excerpt"] = "..." + result["excerpt"]
-                            if end < len(content): result["excerpt"] = result["excerpt"] + "..."
+                            excerpt = content[start:end].strip()
+                            if start > 0: excerpt = "... " + excerpt
+                            if end < len(content): excerpt = excerpt + " ..."
+                            result["excerpt"] = excerpt
                         else:
                             result["excerpt"] = result["content_preview"]
                 else:
@@ -148,21 +164,28 @@ class NodeSearcher:
                     result["excerpt"] = result["title"] or result["label"]
                     result["content_preview"] = ""
 
-                results.append(result)
+                scored_results.append(result)
                 seen_ids.add(node_id)
+
+        # Sort results if priority
+        if order == "priority":
+            scored_results.sort(key=lambda x: x["score"], reverse=True)
+
+        final_results = scored_results[:max_results]
 
         response = {
             "query": query,
-            "scope": scope,
-            "results": results,
-            "total_count": len(results),
-            "has_more": len(results) >= max_results,
+            "search_under": search_under,
+            "results": final_results,
+            "total_count": len(scored_results),
+            "has_more": len(scored_results) > max_results,
             "searched_modules": len(self.km.loaded_modules),
             "total_modules": len(self.km.available_modules),
             "options": {
                 "whole_word": whole_word,
                 "case_sensitive": case_sensitive,
-                "use_regex": use_regex
+                "use_regex": use_regex,
+                "order": order
             }
         }
 

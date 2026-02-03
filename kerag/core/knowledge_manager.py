@@ -609,10 +609,39 @@ class KnowledgeManager:
 
             name = file_id.split("/")[-1]
 
-            result.append({
-                "type": file_type,
-                "id": file_id,
-                "name": name
-            })
+        return result
+
+    def get_subtree_nodes(self, search_under: str) -> List[str]:
+        """Get all node IDs in the subtree rooted at search_under.
+
+        Args:
+            search_under: Root node ID of the subtree
+
+        Returns:
+            List of node IDs including search_under and all its descendants, in DFS order.
+        """
+        # Ensure the root node is loaded
+        if not self.get_node(search_under):
+            return []
+
+        result = []
+        stack = [search_under]
+        seen = set()
+
+        while stack:
+            current_id = stack.pop()
+            if current_id in seen:
+                continue
+            seen.add(current_id)
+            result.append(current_id)
+
+            # Using get_node ensures loading of children if they are in other modules
+            node = self.get_node(current_id)
+
+            if node and node.get("node_type") == "section":
+                # Add children to stack (reversed to maintain order if using DFS)
+                children = node.get("children_ids", [])
+                for child_id in reversed(children):
+                     stack.append(child_id)
 
         return result

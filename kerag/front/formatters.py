@@ -84,8 +84,8 @@ class TreeFormatter(BaseFormatter):
                 content_prefix = new_prefix + ("    " if depth > 0 else "  ")
                 # Show first few lines or truncated
                 preview = content_lines[0]
-                if len(content_lines) > 1 or len(preview) > 100:
-                    preview = preview[:100] + "..."
+                if len(content_lines) > 1 or len(preview) > 50:
+                    preview = preview[:50] + " ... ... "
                 lines.append(f"{content_prefix}{preview}")
 
         # Recurse children
@@ -147,7 +147,7 @@ class ListFormatter(BaseFormatter):
 class MarkdownFormatter(BaseFormatter):
     """Formatter that reconstructs KERAG Markdown from node dictionaries."""
 
-    def __init__(self, display_mode: str = "none", filter_auto_nodes: bool = True, see_also_title: str = "See Also"):
+    def __init__(self, display_mode: str = "full_id", filter_auto_nodes: bool = True, see_also_title: str = "See Also"):
         """
         Args:
             display_mode: 'none' (no labels), 'label' (labels only), 'full_id' (full node IDs)
@@ -194,7 +194,7 @@ class MarkdownFormatter(BaseFormatter):
         return ""
 
     def _render_node(self, node: Dict[str, Any], lines: List[str], current_depth: int = 1,
-                     display_mode: str = "none", filter_auto_nodes: bool = True, see_also_title: str = "See Also"):
+                     display_mode: str = "full_id", filter_auto_nodes: bool = True, see_also_title: str = "See Also"):
         node_type = node.get("type")
 
         if node_type == "section":
@@ -203,6 +203,13 @@ class MarkdownFormatter(BaseFormatter):
 
             lines.append(f"{'#' * current_depth} {title}{suffix}")
             lines.append("")
+
+            # 新增: 如果section有content_preview，显示为引用块
+            content_preview = node.get("content_preview")
+            if content_preview:
+                lines.append("> Preview:")
+                lines.append(f"> {content_preview}".replace("\n", "\n> "))
+                lines.append("")
 
             # Recurse children
             children = node.get("children", {})
@@ -224,7 +231,9 @@ class MarkdownFormatter(BaseFormatter):
 
         elif node_type == "content":
             suffix = self._get_label_suffix(node, display_mode, filter_auto_nodes)
-            content = node.get("content") or node.get("content_preview", "")
+            content = node.get("content", "")
+            if not content and "content_preview" in node:
+                content = "> Preview:\n" + f"> {node['content_preview']}".replace("\n", "\n> ")
 
             if content or suffix:
                 text = content

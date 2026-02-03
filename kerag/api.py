@@ -52,7 +52,7 @@ class KERAGAPI:
 
         # 初始化格式化器
         self.tree_formatter = TreeFormatter(show_metadata=True)
-        self.md_formatter = MarkdownFormatter(display_mode="label")
+        self.md_formatter = MarkdownFormatter(display_mode="full_id")
         self.search_formatter = SearchFormatter()
         self.list_formatter = ListFormatter()
 
@@ -311,17 +311,19 @@ class KERAGAPI:
         })
 
     # 搜索
-    def search(self, keyword: str, scope: str = "all", max_results: int = 50,
-               whole_word: bool = False, case_sensitive: bool = False, use_regex: bool = False) -> Dict[str, Any]:
+    def search(self, keyword: str, search_under: Optional[str] = None, max_results: int = 50,
+               whole_word: bool = False, case_sensitive: bool = False, use_regex: bool = False,
+               order: str = "priority") -> Dict[str, Any]:
         """搜索节点"""
         try:
             res = self.explorer.search_nodes(
                 keyword,
-                scope=scope,
+                search_under=search_under,
                 max_results=max_results,
                 whole_word=whole_word,
                 case_sensitive=case_sensitive,
-                use_regex=use_regex
+                use_regex=use_regex,
+                order=order
             )
             if "error" in res:
                 return self._build_response(False, error=str(res["error"]))
@@ -330,8 +332,9 @@ class KERAGAPI:
             return self._build_response(True, data=results, metadata={
                 "total": res.get("total_count"),
                 "query": keyword,
-                "scope": scope,
-                "has_more": res.get("has_more")
+                "search_under": search_under,
+                "has_more": res.get("has_more"),
+                "order": order
             })
         except Exception as e:
             return self._build_response(False, error=str(e))

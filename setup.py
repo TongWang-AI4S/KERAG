@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="kerag",
-    version="0.1.0",
+    version="0.1.1",
     author="Tong",
     author_email="TongWang_2000@outlook.com",
     description="Knowledge Explorer Retrieval Augmented Generation - 知识探索检索增强生成系统",
